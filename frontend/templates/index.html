@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot</title>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Markdown Styling */
+        .markdown h1 { font-size: 1.8rem; font-weight: bold; margin-bottom: 0.5rem; }
+        .markdown h2 { font-size: 1.5rem; font-weight: bold; margin-bottom: 0.5rem; }
+        .markdown h3 { font-size: 1.3rem; font-weight: bold; margin-bottom: 0.5rem; }
+        
+        .markdown ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 1rem; }
+        .markdown ol { list-style-type: decimal; padding-left: 1.5rem; margin-bottom: 1rem; }
+        
+        .markdown pre {
+            background: #f4f4f4;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-family: monospace;
+            position: relative;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            cursor: pointer;
+            background: #ccc;
+            border: none;
+            padding: 5px;
+            font-size: 12px;
+            border-radius: 5px;
+        }
+    
+        .markdown blockquote {
+            border-left: 4px solid #ccc;
+            padding-left: 10px;
+            margin: 10px 0;
+            color: #555;
+            font-style: italic;
+        }
+    
+        .markdown a {
+            color: blue;
+            text-decoration: underline;
+        }
+
+        /* Smooth fade-in animation */
+        .fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen h-screen w-screen p-4">
+    <div class="w-full max-w-4xl bg-white shadow-lg rounded-lg flex flex-col h-full">
+        <h2 class="text-3xl font-semibold py-4 text-center bg-blue-500 text-white rounded-t-lg">Chatbot</h2>
+
+        <!-- Chat Box -->
+        <div id="chat-box" class="flex-1 overflow-y-auto p-4 border bg-gray-50">
+            <p class="text-gray-600">Hello! How can I assist you today?</p>
+        </div>
+
+        <!-- Typing Indicator -->
+        <div id="typing-indicator" class="hidden text-gray-500 mt-2 text-center">
+            <span class="typing-dots">...</span>
+        </div>
+
+        <!-- Input and Button -->
+        <div class="flex p-4 bg-gray-200 rounded-b-lg">
+            <input id="user-input" type="text" class="flex-1 p-3 border rounded-l-lg focus:ring focus:ring-blue-300" placeholder="Type a message..." onkeydown="handleKey(event)">
+            <button id="send-btn" class="bg-blue-500 text-white px-6 py-3 rounded-r-lg hover:bg-blue-600">Send</button>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById("send-btn").addEventListener("click", sendMessage);
+        
+        function handleKey(event) {
+            if (event.key === "Enter") sendMessage();
+        }
+
+        async function sendMessage() {
+            let userInput = document.getElementById("user-input").value.trim();
+            if (!userInput) return;
+
+            let chatBox = document.getElementById("chat-box");
+            let typingIndicator = document.getElementById("typing-indicator");
+
+            // Append user message
+            chatBox.innerHTML += `<p class="fade-in text-blue-600"><strong>You:</strong> ${userInput}</p>`;
+            document.getElementById("user-input").value = "";
+
+            // Show typing animation
+            typingIndicator.classList.remove("hidden");
+
+            try {
+                let response = await fetch("/chat", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ message: userInput })
+                });
+
+                let data = await response.json();
+                typingIndicator.classList.add("hidden"); // Hide typing animation
+
+                // Convert Markdown to HTML properly
+                let formattedResponse = marked.parse(data.response);
+
+                // Append bot response inside a div with a markdown class and copy button
+                let botResponseHTML = `
+                    <div class="fade-in text-black markdown p-2 relative bg-gray-100 border rounded-lg">
+                        <strong>Bot:</strong> <span class="bot-response">${formattedResponse}</span>
+                        <button class="copy-btn" onclick="copyToClipboard(this)">📋</button>
+                    </div>
+                `;
+                chatBox.innerHTML += botResponseHTML;
+            } catch (error) {
+                typingIndicator.classList.add("hidden"); // Hide typing animation
+                chatBox.innerHTML += `<p class="text-red-600"><strong>Error:</strong> Could not reach chatbot.</p>`;
+            }
+
+            chatBox.scrollTop = chatBox.scrollHeight; // Auto-scroll to latest message
+        }
+
+        function copyToClipboard(button) {
+            let responseElement = button.parentElement.querySelector(".bot-response");
+            if (!responseElement) return;
+
+            let textToCopy = responseElement.innerText;
+
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                button.innerText = "Copied!";
+                setTimeout(() => { button.innerText = "📋"; }, 2000); // Reset after 2s
+            });
+        }
+    </script>
+</body>
+</html>

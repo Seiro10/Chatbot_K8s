@@ -1,0 +1,34 @@
+# Ignore virtual environments
+backend_env/
+frontend_env/
+venv/
+lib/
+lib64/
+include/
+pyvenv.cfg
+bin/
+
+# Ignore system files
+.DS_Store
+Thumbs.db
+
+# Ignore compiled Python files
+__pycache__/
+*.pyc
+*.pyo
+
+# Ignore logs and temporary files
+logs/
+*.log
+
+# Ignore IDE/editor config files
+.vscode/
+.idea/
+
+# Ignore Node.js dependencies (if using React/Vue/Angular)
+node_modules/
+package-lock.json
+yarn.lock
+
+# Ignore Docker build files
+*.dockerignore

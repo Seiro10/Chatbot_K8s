@@ -1,0 +1,32 @@
+# Ignore virtual environment
+tavily_chatbot/
+bin/
+include/
+lib/
+lib64/
+pyvenv.cfg
+
+# Ignore compiled Python files
+__pycache__/
+*.pyc
+*.pyo
+
+# Ignore logs
+*.log
+!app.log  # Keep app.log for debugging if needed
+
+# Ignore environment variables & secrets
+.env
+*.secret
+!env.example  # Keep a reference template
+
+# Ignore local system & editor files
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# Ignore Docker build files (optional)
+*.tar
+*.pid
+*.sock
