@@ -1,34 +1,53 @@
-# Ignore virtual environments
-backend_env/
-frontend_env/
-venv/
-lib/
-lib64/
-include/
-pyvenv.cfg
-bin/
+# --- Terraform ---
+terraform.tfstate
+terraform.tfstate.backup
+.terraform/
+.terraform.lock.hcl
+terraform-debug.log
 
-# Ignore system files
-.DS_Store
-Thumbs.db
+# --- AWS Credentials & Secrets ---
+*.pem
+*.key
+*.crt
+.aws/
+secret-policy.json
 
-# Ignore compiled Python files
+# --- Python ---
 __pycache__/
 *.pyc
 *.pyo
-
-# Ignore logs and temporary files
-logs/
-*.log
-
-# Ignore IDE/editor config files
-.vscode/
+*.pyd
+*.egg-info/
+.Python
+env/
+venv/
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+.DS_Store
+*.swp
 .idea/
+.vscode/
 
-# Ignore Node.js dependencies (if using React/Vue/Angular)
-node_modules/
-package-lock.json
-yarn.lock
+# --- Kubernetes Manifests ---
+k8s-manifests/*.yaml
+k8s-manifests/*.yml
+k8s-manifests/secrets/
 
-# Ignore Docker build files
-*.dockerignore
+# --- Helm ---
+helm/.cache/
+helm/.config/
+
+# --- Logs & Debug Files ---
+*.log
+logs/
+debug.log
+
+# --- Build & Distribution ---
+dist/
+build/
+
+# --- Exclude Local Environment Configurations ---
+frontend_env/
+backend_env/
+infra_env/

@@ -1,4 +1,6 @@
 import os
+import json
+import boto3
 from backend.models.tool_node import BasicToolNode
 from google.cloud import secretmanager
 from langchain_openai import ChatOpenAI
@@ -25,12 +27,16 @@ def get_secret(secret_name):
         return None
 
 # Load API keys
-openai_api_key = os.getenv("OPENAI_API_KEY")
-tavily_api_key = os.getenv("TAVILY_API_KEY")
+def get_secret(secret_name):
+    """Retrieve secret value from AWS Secrets Manager."""
+    client = boto3.client("secretsmanager", region_name="eu-west-3")
+    response = client.get_secret_value(SecretId=secret_name)
+    return json.loads(response["SecretString"]).get(secret_name, "")
 
-# Ensure API keys exist
-if not openai_api_key or not tavily_api_key:
-    raise ValueError("Missing API keys! Ensure they are in Secret Manager or environment variables.")
+# Get API Keys
+openai_api_key = get_secret("openai-api-key")
+tavily_api_key = get_secret("tavily-api-key")
+
 
 # Initialize Tavily Search Tool
 tool = TavilySearchResults(api_key=tavily_api_key, max_results=2)
